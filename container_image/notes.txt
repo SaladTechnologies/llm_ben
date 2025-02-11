@@ -1,0 +1,98 @@
+########## Build and Push
+
+docker image build -t docker.io/saladtechnologies/llmbenchmark:003-dsr1-l8 -f Dockerfile .
+docker push docker.io/saladtechnologies/llmbenchmark:003-dsr1-l8
+
+docker rm -f $(docker container ps -aq)
+docker rmi $(docker images -f dangling=true -q)
+
+
+########## Local Run on a GPU with 24GB VRAM
+
+# Environment Variables
+
+token=********  # HF_TOKEN
+volume=/home/ubuntu/.cache/huggingface  # Select your home folder
+api_key=1234
+model=deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+
+# Run (Host Port: 8080) 
+
+docker run -it --rm --gpus all -p 8080:80 -v $volume:/data \
+-e HF_TOKEN=$token \
+-e HF_HUB_ENABLE_HF_TRANSFER=0 \
+-e MODEL_ID=$model \
+-e HOSTNAME=0.0.0.0 \
+-e PORT=80 \
+-e MAX_TOTAL_TOKENS=4096 \
+-e MAX_INPUT_TOKENS=2048 \
+-e MAX_CONCURRENT_REQUESTS=8 \
+-e MAX_BATCH_SIZE=4 \
+docker.io/saladtechnologies/llmbenchmark:003-dsr1-l8
+
+# other options
+
+-e MAX_TOTAL_TOKENS=16384 \
+-e MAX_INPUT_TOKENS= 12288 \
+-e MAX_CONCURRENT_REQUESTS=1 \
+-e MAX_BATCH_SIZE=1 \
+
+########## Local Inference Test
+
+# Environment Variables
+
+api_key=1234
+model=deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+
+# Non-Streaming
+
+curl http://localhost:8080/v1/chat/completions     -X POST     -d '{
+  "model": "$model",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a good guy!"
+    },
+    {
+      "role": "user",
+      "content": "How to learn AI and Machine Learning?"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 512
+}'     -H 'Content-Type: application/json' -H "Authorization: Bearer $api_key"
+
+
+# Streaming
+
+curl http://localhost:8080/v1/chat/completions     -X POST     -d '{
+  "model": "$model",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a good guy!"
+    },
+    {
+      "role": "user",
+      "content": "How to learn AI and Machine Learning?"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 512
+}'     -H 'Content-Type: application/json' -H "Authorization: Bearer $api_key"
+
+
+########## Test within the container
+
+curl http://localhost/health
+
+ps -ef
+
+root         1     0  0 Feb02 ?        00:00:03 text-generation-launcher
+root       923     1  1 00:18 ?        00:00:31 /opt/conda/bin/python /opt/conda
+root      1058     1  0 00:18 ?        00:00:03 text-generation-router --max-cli
+root      2471     0  0 00:44 pts/0    00:00:00 /bin/bash
+root      2479  2471  0 00:44 pts/0    00:00:00 ps -ef
+
+
+

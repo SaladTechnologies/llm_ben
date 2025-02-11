@@ -1,0 +1,48 @@
+########## Creeat the container groups using SaladCloud Python SDK
+https://docs.salad.com/tutorials/high-performance-apps#build-region-specific-workloads
+
+python create_regional_cgroup_3090.py
+python create_regional_cgroup_4090.py
+
+
+########## Test the public endpoint (the generated access domain name)
+
+# Terminal
+
+api_key=1234
+model=deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+
+curl https://gojiberry-rice-e24v5ssr35sylkin.salad.cloud/v1/chat/completions     -X POST     -d '{
+  "model": "$model",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a good guy!"
+    },
+    {
+      "role": "user",
+      "content": "How to learn AI and Machine Learning?"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 512
+}'     -H 'Content-Type: application/json' -H "Authorization: Bearer $api_key"
+
+curl https://gojiberry-rice-e24v5ssr35sylkin.salad.cloud/health  
+
+# Browser
+
+https://gojiberry-rice-e24v5ssr35sylkin.salad.cloud/health
+
+
+########## Test within the container (via the Interactive Terminal in SaladCloud Portal)
+
+curl http://localhost/health
+
+ps -ef
+
+root         1     0  0 Feb02 ?        00:00:03 text-generation-launcher
+root       923     1  1 00:18 ?        00:00:31 /opt/conda/bin/python /opt/conda
+root      1058     1  0 00:18 ?        00:00:03 text-generation-router --max-cli
+root      2471     0  0 00:44 pts/0    00:00:00 /bin/bash
+root      2479  2471  0 00:44 pts/0    00:00:00 ps -ef

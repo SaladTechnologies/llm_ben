@@ -1,0 +1,11 @@
+pandas
+matplotlib
+jupyterlab
+ipywidgets
+jsonschema<4.0
+
+python-dotenv
+salad-cloud-sdk
+
+speedtest
+pythonping 

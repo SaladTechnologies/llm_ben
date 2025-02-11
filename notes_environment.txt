@@ -1,0 +1,26 @@
+########## Environment
+
+# The current folder: llm_ben
+
+# Create and activate the virtual environment
+conda create --name llm_ben python=3.10
+conda activate llm_ben 
+
+# Install llmperf
+git clone https://github.com/ray-project/llmperf.git
+cd llmperf
+pip install -e .
+
+cp token_benchmark_ray.py ../
+cp analyze-token-benchmark-results.ipynb ../
+cd ..
+
+# Install other dependencies
+pip install -r requirements.txt
+
+# Run JupyterLab 
+jupyter lab --no-browser --port=8888 --ip=0.0.0.0 --allow-root  --NotebookApp.token=''
+
+# if exits
+conda deactivate 
+

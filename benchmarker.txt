@@ -1,0 +1,37 @@
+#################### Run the benchmark 
+https://github.com/ray-project/llmperf
+
+# The current folder: llm_ben
+
+# Test the local endpoint
+
+export OPENAI_API_KEY=1234
+export OPENAI_API_BASE="http://localhost:8080/v1"
+
+# Test the public endpoint - 4090
+
+export OPENAI_API_KEY=1234
+export OPENAI_API_BASE="https://gooseberry-pinto-klg4pz4z4m9sw16j.salad.cloud/v1"
+
+# Test the public endpoint - 3090
+
+export OPENAI_API_KEY=1234
+export OPENAI_API_BASE="https://mulberry-jello-rqa5lf5lupnge92l.salad.cloud/v1"
+
+# Test Cases
+
+python token_benchmark_ray.py \
+--model "deepseek-ai/DeepSeek-R1-Distill-Llama-8B" \
+--mean-input-tokens 1000 \
+--stddev-input-tokens 0 \
+--mean-output-tokens 2000 \
+--stddev-output-tokens 0 \
+--max-num-completed-requests 100 \
+--timeout 600 \
+--num-concurrent-requests 20 \
+--results-dir "result_outputs" \
+--llm-api openai \
+--additional-sampling-params '{}'
+
+
+
